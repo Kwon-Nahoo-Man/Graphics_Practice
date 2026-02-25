@@ -1,6 +1,4 @@
-#include <Windows.h>
-#include <string>
-#include <stdint.h>
+#include "Core/Win32Window.h"
 
 // 콜백 함수
 // 창 메세지 처리할 때 사용
@@ -26,64 +24,16 @@ int main()
     uint32_t width = 1280;
     uint32_t height = 800;
 
-    // 창 생성에 필요한 정보(구조체) 채우기
     HINSTANCE hInstance = GetModuleHandleA(nullptr);
-    WNDCLASS wc = { };
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = className.c_str();
 
-    // 클래스 등록 (성공/실패)
-    if (!RegisterClass(&wc))
+    // 창 생성
+    Craft::Win32Window window(width, height, hInstance, WindowProc);
+
+    // 초기화(초기화 실패 시 프로그램 종료)
+    if (window.Initialize() == false)
     {
-        return 0;
+        return -1;
     }
-
-    // 창 크기 구하기
-    RECT rect{};
-    rect.left = 0;
-    rect.top = 0;
-    rect.right = width;
-    rect.bottom = height;
-    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
-
-    // 창 크기
-    uint32_t windowWidth = rect.right - rect.left;
-    uint32_t windowHeight = rect.bottom - rect.top;
-
-    // 창 생성 위치 가운데로
-    uint32_t positionX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
-    uint32_t positionY = (GetSystemMetrics(SM_CXSCREEN) - windowHeight) / 2;
-
-
-    // 창 객체 생성
-    HWND hwnd = CreateWindow(
-        className.c_str(),              // Window class
-        title.c_str(),                  // Window text
-        WS_OVERLAPPEDWINDOW,            // Window style
-
-        // position and size
-        positionX, positionY, windowWidth, windowHeight,
-
-        NULL,       // Parent window    
-        NULL,       // Menu
-        hInstance,  // Instance handle
-        NULL        // Additional application data
-    );
-
-    // 창 생성 실패 처리
-    if (hwnd == nullptr)
-    {
-        return 0;
-    }
-
-    //// 창의 클라이언트 영역
-    //RECT rect;
-    //GetClientRect(hwnd, &rect);
-
-    // 창 보이기 설정
-    ShowWindow(hwnd, SW_SHOW);
-
 
     // 창에서 발생하는 메세지 처리 루프
     // GetMessage - 동기 방식(Blocking 방식)
