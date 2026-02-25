@@ -1,4 +1,5 @@
 #include "Core/Win32Window.h"
+#include "Graphics/GraphicsContext.h"
 
 // 콜백 함수
 // 창 메세지 처리할 때 사용
@@ -34,6 +35,9 @@ int main()
     {
         return -1;
     }
+
+    Craft::GraphicsContext context;
+    context.Initialize(width, height, window);
 
     // 창에서 발생하는 메세지 처리 루프
     // GetMessage - 동기 방식(Blocking 방식)

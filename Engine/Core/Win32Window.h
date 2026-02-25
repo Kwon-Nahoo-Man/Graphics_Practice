@@ -24,7 +24,7 @@ namespace Craft
 		// getter
 		inline uint32_t Width() const { return width; }
 		inline uint32_t Height() const { return height; }
-		inline HWND Hangle() const { return handle; }
+		inline HWND Handle() const { return handle; }
 
 	private:
 		// 창 등록할 때 사용할 클래스 이름
