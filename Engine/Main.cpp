@@ -39,6 +39,23 @@ int main()
         return 0;
     }
 
+    // 창 크기 구하기
+    RECT rect{};
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = width;
+    rect.bottom = height;
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+
+    // 창 크기
+    uint32_t windowWidth = rect.right - rect.left;
+    uint32_t windowHeight = rect.bottom - rect.top;
+
+    // 창 생성 위치 가운데로
+    uint32_t positionX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
+    uint32_t positionY = (GetSystemMetrics(SM_CXSCREEN) - windowHeight) / 2;
+
+
     // 창 객체 생성
     HWND hwnd = CreateWindow(
         className.c_str(),              // Window class
@@ -46,7 +63,7 @@ int main()
         WS_OVERLAPPEDWINDOW,            // Window style
 
         // position and size
-        CW_USEDEFAULT, CW_USEDEFAULT, width, height,
+        positionX, positionY, windowWidth, windowHeight,
 
         NULL,       // Parent window    
         NULL,       // Menu
@@ -59,6 +76,10 @@ int main()
     {
         return 0;
     }
+
+    //// 창의 클라이언트 영역
+    //RECT rect;
+    //GetClientRect(hwnd, &rect);
 
     // 창 보이기 설정
     ShowWindow(hwnd, SW_SHOW);
