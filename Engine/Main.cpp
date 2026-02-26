@@ -28,7 +28,7 @@ int main()
     HINSTANCE hInstance = GetModuleHandleA(nullptr);
 
     // 창 생성
-    Craft::Win32Window window(width, height, hInstance, WindowProc);
+    Craft::Win32Window window(width, height,title, hInstance, WindowProc);
 
     // 초기화(초기화 실패 시 프로그램 종료)
     if (window.Initialize() == false)
@@ -37,7 +37,7 @@ int main()
     }
 
     Craft::GraphicsContext context;
-    context.Initialize(width, height, window);
+    context.Initialize(window);
 
     // 창에서 발생하는 메세지 처리 루프
     // GetMessage - 동기 방식(Blocking 방식)

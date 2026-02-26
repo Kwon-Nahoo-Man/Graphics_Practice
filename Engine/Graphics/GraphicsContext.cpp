@@ -1,6 +1,7 @@
 
 #include "GraphicsContext.h"
-#include "../Core/Win32Window.h"
+#include "Core/Win32Window.h"
+#include "Core/Common.h"
 
 
 namespace Craft
@@ -12,28 +13,30 @@ namespace Craft
 
 	GraphicsContext::~GraphicsContext()
 	{
-		// 자원 해제
-		if (device)
-		{
-			// Release 함수를 통해서 자원 해제
-			device->Release();
-			device = nullptr;
-		}
-		if (context)
-		{
-			// Release 함수를 통해서 자원 해제
-			context->Release();
-			context = nullptr;
-		}
-		if (swapChain)
-		{
-			// Release 함수를 통해서 자원 해제
-			swapChain->Release();
-			swapChain = nullptr;
-		}
+		SafeRelease(device);
+		SafeRelease(context);
+		SafeRelease(swapChain);
+		
 	}
 
-	void GraphicsContext::Initialize(uint32_t width, uint32_t height, const Win32Window& window)
+	void GraphicsContext::Initialize(const Win32Window& window)
+	{
+		// 멤버 변수 설정
+		width = window.Width();
+		height = window.Height();
+
+		// 장치 생성
+		CreateDevice();
+
+		// SwapChain 생성
+		CreateSwapChain(window);
+
+		// 뷰포트 생성
+		CreateViewport(window);
+
+	}
+
+	void GraphicsContext::CreateDevice()
 	{
 		// 플래그 지정
 		uint32_t flag{};
@@ -85,12 +88,13 @@ namespace Craft
 			__debugbreak();
 			return;
 		}
+	}
 
-		// SwapChain 생성
-		
+	void GraphicsContext::CreateSwapChain(const Win32Window& window)
+	{
 		// 스왑체인 생성해주는 객체 얻어오기
 		IDXGIFactory* factory = nullptr;
-		result = CreateDXGIFactory(
+		HRESULT result = CreateDXGIFactory(
 			__uuidof(IDXGIFactory),
 			reinterpret_cast<void**>(&factory)
 		);
@@ -140,7 +144,7 @@ namespace Craft
 			&swapChainDesc,
 			&swapChain
 		);
-		
+
 		if (FAILED(result))
 		{
 			__debugbreak();
@@ -148,21 +152,18 @@ namespace Craft
 		}
 
 		// 팩토리 객체 해제
-		if (factory)
-		{
-			factory->Release();
-			factory = nullptr;
-		}
+		SafeRelease(factory);
 
+	}
 
-		// 뷰포트 생성
+	void GraphicsContext::CreateViewport(const Win32Window& window)
+	{
 		viewport.TopLeftX = 0.0f;
 		viewport.TopLeftY = 0.0f;
 		viewport.Width = static_cast<float>(window.Width());
 		viewport.Height = static_cast<float>(window.Height());
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
-
 	}
 
 }

@@ -32,5 +32,8 @@
     <ClInclude Include="Graphics\GraphicsContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
