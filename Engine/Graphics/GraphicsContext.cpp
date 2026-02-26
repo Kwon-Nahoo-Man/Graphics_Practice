@@ -3,6 +3,11 @@
 #include "Core/Win32Window.h"
 #include "Core/Common.h"
 
+// RenderTargetView(렌더 타겟 뷰): 화면에 그릴 프레임(이미지) 리소스
+// View(뷰): 특별한 리소스. CPU <->GPU간의 소통을 위해 사용
+// -> CPU에서 리소스를 생성하면 이걸 본따서 GPU에서 복제본을 만들고 사용함
+// 여기서는 포워드 렌더러(Forward Renderer) 할거임
+// 요새 엔진은 디퍼드 렌더러(Deffered Renderer) 함
 
 namespace Craft
 {
@@ -34,6 +39,32 @@ namespace Craft
 		// 뷰포트 생성
 		CreateViewport(window);
 
+		// 렌더 타겟 뷰 생성
+		CreateRenderTargetView();
+
+		// Incomplete: 우리 엔진에서는 뷰포트를 바꿀 필요 없음
+		context->RSSetViewports(1, &viewport);
+
+	}
+
+	void GraphicsContext::BeginScene(float red, float green, float blue)
+	{
+		// 그릴 이미지 준비
+		// 한 색으로 이미지를 칠하기
+		// 렌더링 과정은 단순하게: 빈 도화지 준비 -> 그리기 -> 모니터로 전달
+
+		// 그릴 도화지 설정
+		context->OMSetRenderTargets(1, &renderTargetView, nullptr);
+
+		// 빈 도화지로 만들기 -> 한 색상으로 덧칠하기
+		float backgroundColor[4]{ red,green,blue,1.0f };
+		context->ClearRenderTargetView(renderTargetView, backgroundColor);
+	}
+
+	void GraphicsContext::EndScene(uint32_t vsnyc)
+	{
+		// 모니터에 전달 (백버퍼 - 프론트버퍼 교환)
+		swapChain->Present(0, 0);
 	}
 
 	void GraphicsContext::CreateDevice()
@@ -164,6 +195,44 @@ namespace Craft
 		viewport.Height = static_cast<float>(window.Height());
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
+	}
+
+	void GraphicsContext::CreateRenderTargetView()
+	{
+		// 정석적인 방법
+		// 이미지 속성 구조체 설정
+		// 이걸 기반으로 생성
+
+		// 백버퍼용 렌더타겟뷰 생성
+		// 스왑체인에서 기존 백버퍼 가지고 있음
+		// 스왑체인에서 버퍼 불러와서 생성(똑같은 모양으로)
+
+		// 스왑체인에서 얻어올 백버퍼 정보를 저장할 변수
+		ID3D11Texture2D* backbuffer = nullptr;
+		HRESULT result = swapChain->GetBuffer(0, IID_PPV_ARGS(&backbuffer)); // IID_PPV_ARGS: ID하고 받을 변수 한번에 해주는 매크로
+
+		// 예외처리
+		if (FAILED(result))
+		{
+			__debugbreak();
+			return;
+		}
+
+		// RTV 생성
+		result = device->CreateRenderTargetView(backbuffer, nullptr, &renderTargetView);
+		// 예외처리
+		if (FAILED(result))
+		{
+			// 리소스 해제
+			SafeRelease(backbuffer);
+			
+			__debugbreak();
+			return;
+		}
+
+		// 리소스 해제
+		SafeRelease(backbuffer);
+
 	}
 
 }

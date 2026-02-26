@@ -24,11 +24,22 @@ namespace Craft
 
 		void Initialize(const Win32Window& window);
 
+		// 프레임 준비 함수
+		void BeginScene(float red, float green, float blue);
+
+		// 나중에 REnderer에서 DrawScene(또는 DrawFrame) 함수가 호출될 예정
+
+		// 완성된 프레임을 모니터에 보내는(체인 변경) 함수
+		// vsync가 0이면 수직동기화 안함. 1이면 모니터 수직 동기화 사용
+		void EndScene(uint32_t vsnyc);
+
 	private:
 		void CreateDevice();
 		void CreateSwapChain(const Win32Window& window);
 		void CreateViewport(const Win32Window& window);
 
+		// 렌더 타겟 뷰 생성
+		void CreateRenderTargetView();
 
 	private:
 		// 장치류(디바이스, 디바이스 컨텍스트, 스왑체인)
@@ -37,6 +48,10 @@ namespace Craft
 		ID3D11Device* device = nullptr;
 		ID3D11DeviceContext* context = nullptr;
 		IDXGISwapChain* swapChain = nullptr;
+
+		// 리소스
+		// RTV - 그리기 대상 리소스
+		ID3D11RenderTargetView* renderTargetView{};
 
 		// 뷰포트
 		D3D11_VIEWPORT viewport{};
