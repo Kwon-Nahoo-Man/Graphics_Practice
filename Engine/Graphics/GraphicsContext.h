@@ -4,6 +4,7 @@
 #include <dxgi.h>	// DXGI 장치 관련(스왑체인)
 #include <string>
 
+
 // 장치(그래픽카드)
 // Direct3D에서 "장치"로 다루는 객체는 3개
 // Device: 리소스 생성
@@ -33,6 +34,11 @@ namespace Craft
 		// vsync가 0이면 수직동기화 안함. 1이면 모니터 수직 동기화 사용
 		void EndScene(uint32_t vsnyc);
 
+		// Getter
+		inline ID3D11Device& GetDevice() const { return *device; }
+		inline ID3D11DeviceContext& GetDeviceContext() const { return *context; }
+		static GraphicsContext& Get();
+
 	private:
 		void CreateDevice();
 		void CreateSwapChain(const Win32Window& window);
@@ -59,6 +65,9 @@ namespace Craft
 		// 화면 크기
 		uint32_t width{};
 		uint32_t height{};
+
+		// 전역변수
+		static GraphicsContext* instance;
 
 	};
 }
