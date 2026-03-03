@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Core/Win32Window.h"
 #include "Graphics/GraphicsContext.h"
+#include "Graphics/Renderer.h"
 
 namespace Craft
 {
@@ -39,6 +40,9 @@ namespace Craft
 		// 초기화
 		graphicsContext->Initialize(*window);
 
+		renderer = std::make_unique<Renderer>();
+		renderer->Initialize();
+
 		return false;
 	}
 
@@ -71,6 +75,10 @@ namespace Craft
 			{
 				// 프레임 처리
 				graphicsContext->BeginScene(0.6f, 0.7f, 0.8f);
+
+				// Draw call, Scene 그리기
+				renderer->DrawScene();
+
 				graphicsContext->EndScene(setting.vsync);
 
 			}

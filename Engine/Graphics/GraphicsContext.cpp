@@ -25,6 +25,7 @@ namespace Craft
 		SafeRelease(device);
 		SafeRelease(context);
 		SafeRelease(swapChain);
+		SafeRelease(renderTargetView);
 		
 	}
 
